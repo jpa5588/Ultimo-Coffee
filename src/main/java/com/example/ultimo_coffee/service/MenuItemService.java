@@ -25,4 +25,8 @@ public interface MenuItemService {
     // Retrieves one menu item using its database ID.
     // The controller will use this to load an item for editing.
     MenuItem getMenuItemById(long id);
+
+    // Returns the menu items currently available to order.
+    // The POS controller will call this method.
+    List<MenuItem> getAvailableMenuItems();
 }

@@ -77,4 +77,13 @@ public class MenuItemServiceImpl implements MenuItemService {
         // This follows the missing-record check in your course service.
         throw new RuntimeException("Menu item not found for ID: " + id);
     }
+
+    // Implements getAvailableMenuItems() from the service interface.
+    @Override
+    public List<MenuItem> getAvailableMenuItems() {
+
+        // Requests the available items from the repository.
+        // The repository retrieves these records from MySQL.
+        return menuItemRepository.findByAvailableTrueOrderByCategoryAscNameAsc();
+    }
 }

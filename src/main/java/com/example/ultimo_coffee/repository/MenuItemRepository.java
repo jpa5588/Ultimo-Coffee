@@ -39,4 +39,9 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
      * List<MenuItem> is the collection returned to the calling service.
      */
     List<MenuItem> findAllByOrderByCategoryAscNameAsc();
+
+    // Used by the POS.
+    // AvailableTrue selects items whose available property is true.
+    // OrderByCategoryAscNameAsc sorts by category, then name.
+    List<MenuItem> findByAvailableTrueOrderByCategoryAscNameAsc();
 }

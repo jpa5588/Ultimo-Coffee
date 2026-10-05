@@ -63,15 +63,20 @@
             ULTIMO COFFEE
         </a>
 
-        <nav aria-label="Main navigation">
+        <nav class="d-flex gap-2" aria-label="Main navigation">
 
-            <!-- aria-current identifies the current page. -->
+            <!-- Current Home page: menu management. -->
             <a class="btn btn-success"
                th:href="@{/manage/menu}"
                aria-current="page">
                 Menu
             </a>
 
+            <!-- Opens the POS page through PosController. -->
+            <a class="btn btn-outline-success"
+               th:href="@{/pos}">
+                POS
+            </a>
         </nav>
     </div>
 </header>
