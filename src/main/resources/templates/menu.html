@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+
+<!-- Enables Thymeleaf attributes such as th:field and th:each. -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <!-- Supports standard text characters. -->
+    <meta charset="UTF-8">
+
+    <!-- Allows Bootstrap's responsive layout to work on smaller screens. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Text displayed in the browser tab. -->
+    <title>Menu management | Ultimo Coffee</title>
+
+    <!--
+        Loads Bootstrap's CSS.
+
+        Bootstrap provides the classes used throughout this page.
+
+        integrity verifies the downloaded stylesheet.
+        crossorigin supports that verification when loading from the CDN.
+    -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+            crossorigin="anonymous">
+
+    <!-- Small appearance adjustments for the coffee project. -->
+    <style>
+        /* Keeps the cream background from the earlier design. */
+        body {
+            background-color: #f7f5ef;
+        }
+
+        /* Gives the main heading its original serif appearance. */
+        .coffee-heading {
+            font-family: Georgia, serif;
+        }
+    </style>
+</head>
+
+<body>
+
+<!--
+    navbar: Bootstrap's navigation styling.
+    bg-white: white background.
+    border-bottom: adds a border below the navigation.
+    py-3: adds vertical padding.
+-->
+<header class="navbar bg-white border-bottom py-3">
+
+    <!--
+        container-fluid: uses the available width.
+        px-4: adds horizontal padding.
+    -->
+    <div class="container-fluid px-4">
+
+        <!-- The home link calls "/" in PageController. -->
+        <a class="navbar-brand fw-bold text-success"
+           th:href="@{/}">
+            ULTIMO COFFEE
+        </a>
+
+        <nav aria-label="Main navigation">
+
+            <!-- aria-current identifies the current page. -->
+            <a class="btn btn-success"
+               th:href="@{/manage/menu}"
+               aria-current="page">
+                Menu
+            </a>
+
+        </nav>
+    </div>
+</header>
+
+<!--
+    container-xxl: centers the content and limits its width on large screens.
+    py-4: adds space above and below the content.
+-->
+<main class="container-xxl py-4">
+
+    <!-- mb-4 adds space below this heading section. -->
+    <div class="mb-4">
+
+        <!-- small, fw-semibold, and text-success control text appearance. -->
+        <p class="small fw-semibold text-success mb-2">
+            MENU MANAGEMENT
+        </p>
+
+        <h1 class="display-6 coffee-heading">
+            A menu that stays current.
+        </h1>
+
+        <p class="text-body-secondary">
+            Add items, update prices, and change availability.
+        </p>
+    </div>
+
+    <!--
+        Displays the flash message added by the controller after saving.
+
+        th:if only displays this element when a message exists.
+        th:text replaces the example text with that message.
+
+        alert alert-success gives it Bootstrap's success styling.
+    -->
+    <div class="alert alert-success"
+         th:if="${successMessage != null}"
+         th:text="${successMessage}"
+         role="status">
+        Menu item saved.
+    </div>
+
+    <!--
+        row starts a Bootstrap grid row.
+        g-4 adds spacing between the columns.
+        align-items-start aligns both panels at the top.
+    -->
+    <div class="row g-4 align-items-start">
+
+        <!--
+            col-12: full width on smaller screens.
+            col-lg-4: four of twelve columns on large screens.
+
+            This is the left side containing the form.
+        -->
+        <section class="col-12 col-lg-4"
+                 aria-labelledby="menu-form-title">
+
+            <!-- card provides a bordered panel; shadow-sm adds a light shadow. -->
+            <div class="card shadow-sm">
+
+                <!-- card-body adds padding inside the card. -->
+                <div class="card-body p-4">
+
+                    <!--
+                        d-flex arranges the heading and link beside each other.
+                        justify-content-between places them at opposite ends.
+                        gap-3 adds space between them.
+                    -->
+                    <div class="d-flex justify-content-between
+                                align-items-center gap-3 mb-4">
+
+                        <!-- A missing ID means this is a new menu item. -->
+                        <h2 id="menu-form-title"
+                            class="h5 mb-0"
+                            th:text="${menuItem.id == null
+                                ? 'Add a menu item'
+                                : 'Edit menu item'}">
+                            Add a menu item
+                        </h2>
+
+                        <!-- Opens a blank form through the controller. -->
+                        <a class="btn btn-outline-success btn-sm text-nowrap"
+                           th:href="@{/manage/menu/new}">
+                            New item
+                        </a>
+                    </div>
+
+                    <!--
+                        th:action specifies the controller's save route.
+                        th:object selects the menuItem supplied by the controller.
+                        method="post" submits the form values.
+
+                        Each th:field below binds to a property of menuItem.
+                    -->
+                    <form th:action="@{/manage/menu/save}"
+                          th:object="${menuItem}"
+                          method="post">
+
+                        <!--
+                            Sends the item's ID when editing.
+
+                            A new item has a blank ID.
+                            An existing item has its saved database ID.
+                        -->
+                        <input type="hidden" th:field="*{id}">
+
+                        <!-- Displays a message when Spring reports binding errors. -->
+                        <div class="alert alert-danger"
+                             th:if="${#fields.hasAnyErrors()}"
+                             role="alert">
+                            Please check the form values and try again.
+                        </div>
+
+                        <!-- Item name field. -->
+                        <div class="mb-3">
+
+                            <!-- for connects this label to the input's ID. -->
+                            <label for="name" class="form-label">
+                                Item name
+                            </label>
+
+                            <!--
+                                form-control styles the input.
+                                th:field reads and submits the name property.
+                                th:errorclass adds red styling if binding fails.
+                                required and maxlength provide browser checks.
+                            -->
+                            <input id="name"
+                                   type="text"
+                                   class="form-control"
+                                   th:field="*{name}"
+                                   th:errorclass="is-invalid"
+                                   maxlength="80"
+                                   placeholder="Example: Latte"
+                                   required>
+                        </div>
+
+                        <!-- Category selection. -->
+                        <div class="mb-3">
+
+                            <label for="category" class="form-label">
+                                Category
+                            </label>
+
+                            <!-- form-select styles a dropdown using Bootstrap. -->
+                            <select id="category"
+                                    class="form-select"
+                                    th:field="*{category}"
+                                    th:errorclass="is-invalid"
+                                    required>
+
+                                <!-- Blank value requires the user to choose. -->
+                                <option value="">Choose a category</option>
+
+                                <!-- The value is what gets saved to the model. -->
+                                <option value="COFFEE">Coffee</option>
+                                <option value="TEA">Tea</option>
+                                <option value="FOOD">Food</option>
+                            </select>
+                        </div>
+
+                        <!-- Optional description. -->
+                        <div class="mb-3">
+
+                            <label for="description" class="form-label">
+                                Description
+                            </label>
+
+                            <!-- rows controls the textarea's initial height. -->
+                            <textarea id="description"
+                                      class="form-control"
+                                      th:field="*{description}"
+                                      maxlength="250"
+                                      rows="3"
+                                      placeholder="A short description of the item"></textarea>
+                        </div>
+
+                        <!-- Base price field. -->
+                        <div class="mb-3">
+
+                            <label for="price" class="form-label">
+                                Base price ($)
+                            </label>
+
+                            <!--
+                                Browser checks:
+                                min and max set the permitted price range.
+                                step allows increments of one cent.
+
+                                Spring binds this value to the BigDecimal price.
+                            -->
+                            <input id="price"
+                                   type="number"
+                                   class="form-control"
+                                   th:field="*{price}"
+                                   th:errorclass="is-invalid"
+                                   min="0.01"
+                                   max="500.00"
+                                   step="0.01"
+                                   placeholder="4.50"
+                                   required>
+
+                            <!-- Shown when Spring cannot bind the price correctly. -->
+                            <div class="invalid-feedback"
+                                 th:if="${#fields.hasErrors('price')}">
+                                Enter a valid price, such as 4.50.
+                            </div>
+                        </div>
+
+                        <!--
+                            form-check styles the checkbox and its label.
+
+                            th:field handles both checked and unchecked values.
+                        -->
+                        <div class="form-check mb-2">
+
+                            <input id="taxable"
+                                   type="checkbox"
+                                   class="form-check-input"
+                                   th:field="*{taxable}">
+
+                            <label for="taxable" class="form-check-label">
+                                Apply tax
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-4">
+
+                            <input id="available"
+                                   type="checkbox"
+                                   class="form-check-input"
+                                   th:field="*{available}">
+
+                            <label for="available" class="form-check-label">
+                                Available to order
+                            </label>
+                        </div>
+
+                        <!-- Displays the save and cancel controls beside each other. -->
+                        <div class="d-flex gap-2">
+
+                            <!--
+                                type="submit" sends the form.
+                                flex-grow-1 lets this button fill the available space.
+                            -->
+                            <button class="btn btn-success flex-grow-1"
+                                    type="submit">
+                                Save menu item
+                            </button>
+
+                            <!-- Cancel appears only while editing an existing item. -->
+                            <a class="btn btn-outline-secondary"
+                               th:if="${menuItem.id != null}"
+                               th:href="@{/manage/menu/new}">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </section>
+
+        <!--
+            col-lg-8 uses the remaining eight grid columns on large screens.
+            col-12 places this panel below the form on smaller screens.
+        -->
+        <section class="col-12 col-lg-8"
+                 aria-labelledby="menu-list-title">
+
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+
+                    <h2 id="menu-list-title" class="h5 mb-4">
+                        Menu items
+                    </h2>
+
+                    <!-- Allows horizontal scrolling when the table needs more space. -->
+                    <div class="table-responsive">
+
+                        <!--
+                            table applies Bootstrap's table styling.
+                            table-hover highlights a row when the pointer is over it.
+                            align-middle vertically centers cell content.
+                        -->
+                        <table class="table table-hover align-middle">
+
+                            <!-- table-light gives the heading row a light background. -->
+                            <thead class="table-light">
+                            <tr>
+                                <th scope="col">Item</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Taxable</th>
+                                <th scope="col">Availability</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+
+                            <!-- Displayed when the controller supplies an empty list. -->
+                            <tr th:if="${#lists.isEmpty(listMenuItems)}">
+                                <td colspan="6"
+                                    class="text-center text-body-secondary py-4">
+                                    No menu items yet. Add your first item using the form.
+                                </td>
+                            </tr>
+
+                            <!--
+                                Creates one row for each item in listMenuItems.
+
+                                "item" is the current MenuItem during each repetition.
+                            -->
+                            <tr th:each="item : ${listMenuItems}">
+
+                                <td>
+                                    <div class="fw-semibold"
+                                         th:text="${item.name}">
+                                        Item name
+                                    </div>
+
+                                    <div class="small text-body-secondary"
+                                         th:text="${item.description}">
+                                        Description
+                                    </div>
+                                </td>
+
+                                <td th:text="${item.category}">
+                                    COFFEE
+                                </td>
+
+                                <!-- Formats the saved price with two decimal places. -->
+                                <td class="text-nowrap"
+                                    th:text="${'$' + #numbers.formatDecimal(
+                                        item.price, 1, 'COMMA', 2, 'POINT')}">
+                                    $0.00
+                                </td>
+
+                                <!-- Converts the boolean value into readable text. -->
+                                <td th:text="${item.taxable ? 'Yes' : 'No'}">
+                                    Yes
+                                </td>
+
+                                <td>
+
+                                    <!--
+                                        badge creates a compact status label.
+                                        rounded-pill gives it rounded ends.
+
+                                        th:classappend chooses green or yellow styling.
+                                    -->
+                                    <span class="badge rounded-pill"
+                                          th:classappend="${item.available
+                                              ? 'text-bg-success'
+                                              : 'text-bg-warning'}"
+                                          th:text="${item.available
+                                              ? 'Available'
+                                              : 'Unavailable'}">
+                                        Available
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    <!-- Passes this item's ID to the edit route. -->
+                                    <a class="btn btn-outline-success btn-sm"
+                                       th:href="@{/manage/menu/edit/{id}(id=${item.id})}"
+                                       th:aria-label="|Edit ${item.name}|">
+                                        Edit
+                                    </a>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p class="small text-body-secondary mb-0 mt-3">
+                        To remove an item from ordering, clear
+                        “Available to order” and save the item.
+                    </p>
+
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+</body>
+</html>
